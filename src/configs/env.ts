@@ -13,7 +13,11 @@ export const envSchema = z.object({
     .enum(["fatal", "error", "warn", "info", "debug", "trace"])
     .default("info"),
 
-  CORS_ORIGIN: z.url()
+  CORS_ORIGIN: z.url(),
+
+  DATABASE_URL: z.string().min(1),
+
+  REDIS_URL: z.string().min(1)
 });
 
 export type Env = z.infer<typeof envSchema>;
