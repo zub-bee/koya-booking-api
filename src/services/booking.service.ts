@@ -145,7 +145,7 @@ export const BookingService = {
       return toResponse(newBooking);
     });
 
-    // Level 4: Store idempotency response (24h TTL)
+    // store idempotency response (24h TTL)
     if (idempotencyKey) {
       const idemKey = `idempotency:booking:${idempotencyKey}`;
       await redis.set(
