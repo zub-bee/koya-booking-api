@@ -27,7 +27,7 @@ export const SlotService = {
       ? await query.where(eq(slots.provider, provider))
       : await query;
 
-    await redis.set(cacheKey, JSON.stringify(result), "EX", CACHE_TTL);
+    await redis.set(cacheKey, JSON.stringify(result), { ex: CACHE_TTL });
     return result;
   },
 

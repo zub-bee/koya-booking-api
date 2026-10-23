@@ -153,8 +153,7 @@ export const BookingService = {
       await redis.set(
         idemKey,
         JSON.stringify({ bodyHash: JSON.stringify(body), booking }),
-        "EX",
-        86400
+        { ex: 86400 }
       );
     }
 

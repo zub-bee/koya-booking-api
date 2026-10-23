@@ -17,9 +17,14 @@ export const envSchema = z.object({
 
   DATABASE_URL: z.string().min(1),
 
-  REDIS_URL: z.string().min(1),
+  API_KEY: z.string().min(1),
 
-  API_KEY: z.string().min(1)
+  // Local Redis (development)
+  REDIS_URL: z.string().optional(),
+
+  // Upstash Redis (production)
+  UPSTASH_REDIS_REST_URL: z.string().optional(),
+  UPSTASH_REDIS_REST_TOKEN: z.string().optional()
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -27,7 +32,7 @@ export type Env = z.infer<typeof envSchema>;
 const result = envSchema.safeParse(process.env);
 
 if (!result.success) {
-  console.error("❌ Invalid environment configuration");
+  console.error("Invalid environment configuration");
   console.error(z.prettifyError(result.error));
   process.exit(1);
 }

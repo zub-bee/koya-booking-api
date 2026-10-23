@@ -3,20 +3,17 @@ import pg from "pg";
 import * as schema from "../db/schema/index";
 import { drizzle } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
-import { config } from "dotenv";
-
-config({ path: ".env" }); // or .env.local
-
-const sql = neon(process.env.DATABASE_URL!);
-export const prodDb = drizzle({ client: sql });
+import env from "./env";
 
 const { Pool } = pg;
 
+const sql = neon(env.DATABASE_URL);
+export const prodDb = drizzle({ client: sql });
+
 export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL
+  connectionString: env.DATABASE_URL
 });
 
-// for dev env
 export const Devdb = drizzleDev(pool, { schema });
 
 export const connectDatabase = async () => {
