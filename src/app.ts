@@ -7,6 +7,7 @@ import { notFoundHandler } from "./middlewares/not-found-handler";
 import { errorHandler } from "./middlewares/error-handler";
 import { setupSwagger } from "./configs/swagger";
 import healthRoutes from "./routes/health.routes";
+import bookingRoutes from "./routes/booking.routes";
 import env from "./configs/env";
 import sourceMapSupport from "source-map-support";
 sourceMapSupport.install();
@@ -36,6 +37,12 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/api/health", healthRoutes);
+
+app.use("/api/booking", bookingRoutes);
+
+// app.use("/api/slots", slotsRoutes);
+
+// app.use("/api/reset", resetRoutes);
 
 // Not found handler (should be after routes)
 app.use(notFoundHandler);
