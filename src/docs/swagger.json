@@ -40,17 +40,55 @@
     },
     "/slots": {
       "get": {
-        "description": "",
+        "description": "List all slots, earliest start first",
         "parameters": [
           {
             "name": "provider",
             "in": "query",
-            "type": "string"
+            "required": false,
+            "type": "string",
+            "description": "Filter by provider (exact match)"
           }
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "The slots",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "slots": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "s1"
+                      },
+                      "provider": {
+                        "type": "string",
+                        "example": "Dr Ade"
+                      },
+                      "available": {
+                        "type": "boolean",
+                        "example": true
+                      },
+                      "start": {
+                        "type": "string",
+                        "example": "2026-12-10T09:00:00Z"
+                      },
+                      "end": {
+                        "type": "string",
+                        "example": "2026-12-10T09:30:00Z"
+                      }
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -60,16 +98,38 @@
     },
     "/reset": {
       "post": {
-        "description": "",
+        "description": "Replace all slots. Deletes every booking and replaces all slots with the ones sent.",
         "parameters": [
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
                 "slots": {
-                  "example": "any"
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "s1"
+                      },
+                      "provider": {
+                        "type": "string",
+                        "example": "Dr Ade"
+                      },
+                      "start": {
+                        "type": "string",
+                        "example": "2026-12-10T09:00:00Z"
+                      },
+                      "end": {
+                        "type": "string",
+                        "example": "2026-12-10T09:30:00Z"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -77,7 +137,43 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Done",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "slots": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "s1"
+                      },
+                      "provider": {
+                        "type": "string",
+                        "example": "Dr Ade"
+                      },
+                      "available": {
+                        "type": "boolean",
+                        "example": true
+                      },
+                      "start": {
+                        "type": "string",
+                        "example": "2026-12-10T09:00:00Z"
+                      },
+                      "end": {
+                        "type": "string",
+                        "example": "2026-12-10T09:30:00Z"
+                      }
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -87,27 +183,107 @@
     },
     "/bookings/": {
       "get": {
-        "description": "",
+        "description": "List a person's bookings, oldest first. Email match is case-insensitive.",
         "parameters": [
           {
             "name": "email",
             "in": "query",
-            "type": "string"
+            "required": true,
+            "type": "string",
+            "description": "Email address of the person"
           },
           {
             "name": "limit",
             "in": "query",
-            "type": "string"
+            "required": false,
+            "type": "integer",
+            "description": "1 to 50. Defaults to 10."
           },
           {
             "name": "cursor",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "Pagination cursor from previous response next_cursor"
+          },
+          {
+            "name": "description",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "schema",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "next_cursor",
             "in": "query",
             "type": "string"
           }
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "A page of bookings",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "bookings": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "string"
+                      },
+                      "slot_id": {
+                        "type": "string",
+                        "example": "s1"
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "Ada Obi"
+                      },
+                      "email": {
+                        "type": "string",
+                        "example": "ada@example.com"
+                      },
+                      "status": {
+                        "type": "string",
+                        "example": "confirmed"
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "example": "2026-10-23T03:19:47.580Z"
+                      }
+                    }
+                  }
+                },
+                "next_cursor": {
+                  "type": "string",
+                  "example": "string"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid limit",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "limit must be between 1 and 50"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -115,8 +291,37 @@
         }
       },
       "post": {
-        "description": "",
+        "description": "Book a slot",
         "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "type": "string",
+            "description": "Optional. Same key + same body returns the same booking without creating a duplicate."
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "slot_id": {
+                  "type": "string",
+                  "example": "s1"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "Ada Obi"
+                },
+                "email": {
+                  "type": "string",
+                  "example": "ada@example.com"
+                }
+              }
+            }
+          },
           {
             "name": "idempotency-key",
             "in": "header",
@@ -125,17 +330,124 @@
         ],
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Booking created",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "example": "string"
+                },
+                "slot_id": {
+                  "type": "string",
+                  "example": "s1"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "Ada Obi"
+                },
+                "email": {
+                  "type": "string",
+                  "example": "ada@example.com"
+                },
+                "status": {
+                  "type": "string",
+                  "example": "confirmed"
+                },
+                "created_at": {
+                  "type": "string",
+                  "example": "2026-10-23T03:19:47.580Z"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid field, or slot has already started",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "slot_id is required"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Slot not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "slot not found"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "409": {
+            "description": "Slot already booked",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "slot not available"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "422": {
+            "description": "Idempotency key reused with different body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "idempotency key reused with different body"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "429": {
+            "description": "Too many attempts for this email",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "too many attempts"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
     },
     "/bookings/{id}": {
       "get": {
-        "description": "",
+        "description": "Get a single booking by ID",
         "parameters": [
           {
             "name": "id",
@@ -146,15 +458,62 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "The booking",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "example": "string"
+                },
+                "slot_id": {
+                  "type": "string",
+                  "example": "s1"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "Ada Obi"
+                },
+                "email": {
+                  "type": "string",
+                  "example": "ada@example.com"
+                },
+                "status": {
+                  "type": "string",
+                  "example": "confirmed"
+                },
+                "created_at": {
+                  "type": "string",
+                  "example": "2026-10-23T03:19:47.580Z"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Booking not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "booking not found"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       },
       "delete": {
-        "description": "",
+        "description": "Cancel a booking. Sets status to cancelled and frees the slot.",
         "parameters": [
           {
             "name": "id",
@@ -165,10 +524,72 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "The cancelled booking",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "example": "string"
+                },
+                "slot_id": {
+                  "type": "string",
+                  "example": "s1"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "Ada Obi"
+                },
+                "email": {
+                  "type": "string",
+                  "example": "ada@example.com"
+                },
+                "status": {
+                  "type": "string",
+                  "example": "cancelled"
+                },
+                "created_at": {
+                  "type": "string",
+                  "example": "2026-10-23T03:19:47.580Z"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Booking not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "booking not found"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "409": {
+            "description": "Already cancelled",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "already cancelled"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
