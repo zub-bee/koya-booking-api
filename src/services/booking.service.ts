@@ -1,4 +1,4 @@
-import { db } from "../configs/database";
+import { Devdb, prodDb } from "../configs/database";
 import { redis } from "../configs/redis";
 import { bookings } from "../db/schema/booking";
 import { slots } from "../db/schema/slots";
@@ -6,6 +6,8 @@ import { and, asc, eq, gt, or, sql } from "drizzle-orm";
 import { ApiError } from "../utils/api-error";
 import { z } from "zod";
 import { env } from "process";
+
+const db = process.env.NODE_ENV === "production" ? prodDb : Devdb;
 
 const bookingSchema = z.object({
   slot_id: z.string().min(1, "slot_id is required"),

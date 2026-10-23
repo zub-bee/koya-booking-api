@@ -1,8 +1,10 @@
-import { db } from "../configs/database";
+import { Devdb, prodDb } from "../configs/database";
 import { redis } from "../configs/redis";
 import { slots } from "../db/schema/slots";
 import { bookings } from "../db/schema/booking";
 import { asc, eq } from "drizzle-orm";
+
+const db = process.env.NODE_ENV === "production" ? prodDb : Devdb;
 
 type SlotInput = {
   id: string;
