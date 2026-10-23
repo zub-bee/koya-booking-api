@@ -7,13 +7,17 @@ export const envSchema = z.object({
     .enum(["development", "test", "production"])
     .default("development"),
 
-  PORT: z.string().regex(/^\d+$/, "PORT must be a number").transform(Number),
+  PORT: z
+    .string()
+    .regex(/^\d+$/, "PORT must be a number")
+    .default("3000")
+    .transform(Number),
 
   LOG_LEVEL: z
     .enum(["fatal", "error", "warn", "info", "debug", "trace"])
     .default("info"),
 
-  CORS_ORIGIN: z.url(),
+  CORS_ORIGIN: z.url().optional(),
 
   DATABASE_URL: z.string().min(1),
 
