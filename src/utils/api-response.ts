@@ -9,38 +9,31 @@ type ApiResponseParams<T> = {
 export class ApiResponse<T = unknown> {
   public readonly error: string | undefined;
   public readonly data?: T | null;
-  public readonly statusCode!: number;
 
   constructor({ error, data }: ApiResponseParams<T>) {
     this.error = error;
     this.data = data;
   }
 
-  send(res: Response): Response {
-    return res.status(this.statusCode).json({
+  send(res: Response, statusCode: number, dataName?: string): Response {
+    return res.status(statusCode).json({
       error: this.error,
-      ...(this.data !== undefined && { data: this.data })
+      ...(this.data !== undefined && dataName && { [dataName]: this.data })
     });
   }
 
-  static Success<T>(res: Response, data?: T): Response {
+  static Success<T>(res: Response, dataName: string, data?: T): Response {
     return new ApiResponse<T>({
       data
-    }).send(res);
-  }
-
-  static NotFound<T>(res: Response, error: string): Response {
-    return new ApiResponse<T>({
-      error
-    }).send(res);
+    }).send(res, STATUS_CODES.OK, dataName);
   }
 
   static ok<T>(res: Response, data?: T) {
-    return ApiResponse.Success(res, data);
+    return ApiResponse.Success(res, "data", data);
   }
 
   static created<T>(res: Response, data?: T) {
-    return ApiResponse.Success(res, data);
+    return ApiResponse.Success(res, "data", data);
   }
 }
 

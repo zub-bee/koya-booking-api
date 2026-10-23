@@ -41,9 +41,7 @@ app.use("/api/health", healthRoutes);
 
 app.use("/api/booking", bookingRoutes);
 
-app.use("/api/slots", slotRoutes);
-
-// app.use("/api/reset", resetRoutes);
+app.use("/api/", slotRoutes);
 
 // Not found handler (should be after routes)
 app.use(notFoundHandler);
