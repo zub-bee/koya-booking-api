@@ -22,7 +22,13 @@ app.use(
   cors({
     origin: env.CORS_ORIGIN,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "X-API-Key", "Idempotency-Key"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Requested-With",
+      "X-API-Key",
+      "Idempotency-Key"
+    ],
     credentials: true
   })
 );
