@@ -2,26 +2,30 @@ import { db } from "../configs/database";
 import { redis } from "../configs/redis";
 import { slots } from "../db/schema/slots";
 import { bookings } from "../db/schema/booking";
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 
-type ReplaceSlots = {
+type SlotInput = {
   id: string;
   provider: string;
-  available: boolean;
-  start: Date;
-  end: Date;
+  start: string | Date;
+  end: string | Date;
 };
 
 const CACHE_KEY = "slots:all";
 const CACHE_TTL = 60;
 
 export const SlotService = {
-  async getAll() {
-    const cached = await redis.get(CACHE_KEY);
+  async getAll(provider?: string) {
+    const cacheKey = provider ? `${CACHE_KEY}:${provider}` : CACHE_KEY;
+    const cached = await redis.get(cacheKey);
     if (cached) return JSON.parse(cached);
 
-    const result = await db.select().from(slots).orderBy(slots.start);
-    await redis.set(CACHE_KEY, JSON.stringify(result), "EX", CACHE_TTL);
+    const query = db.select().from(slots).orderBy(asc(slots.start));
+    const result = provider
+      ? await query.where(eq(slots.provider, provider))
+      : await query;
+
+    await redis.set(cacheKey, JSON.stringify(result), "EX", CACHE_TTL);
     return result;
   },
 
@@ -30,25 +34,17 @@ export const SlotService = {
     return slot ?? null;
   },
 
-  async update(id: string, data: Omit<ReplaceSlots, "id">) {
-    const [updated] = await db
-      .update(slots)
-      .set(data)
-      .where(eq(slots.id, id))
-      .returning();
-    await redis.del(CACHE_KEY);
-    return updated ?? null;
-  },
-
-  async replaceAll(newSlots: ReplaceSlots[]) {
-    const parsed = newSlots.map(s => ({
-      ...s,
+  async replaceAll(newSlots: SlotInput[]) {
+    const values = newSlots.map(s => ({
+      id: s.id,
+      provider: s.provider,
+      available: true,
       start: new Date(s.start),
       end: new Date(s.end)
     }));
     await db.delete(bookings);
     await db.delete(slots);
-    const inserted = await db.insert(slots).values(parsed).returning();
+    const inserted = await db.insert(slots).values(values).returning();
     await redis.del(CACHE_KEY);
     return inserted;
   }
