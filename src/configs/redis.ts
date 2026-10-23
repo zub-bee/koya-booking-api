@@ -18,15 +18,16 @@ type RedisClient = {
 
 function createRedis(): RedisClient {
   if (env.NODE_ENV === "production") {
-    if (!env.UPSTASH_REDIS_REST_URL || !env.UPSTASH_REDIS_REST_TOKEN) {
+    const url =
+      env.UPSTASH_REDIS_REST_URL ?? process.env.REDIS_KV_REST_API_URL;
+    const token =
+      env.UPSTASH_REDIS_REST_TOKEN ?? process.env.REDIS_KV_REST_API_TOKEN;
+    if (!url || !token) {
       throw new Error(
-        "UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN are required in production"
+        "Redis credentials are required in production (UPSTASH_REDIS_REST_URL/TOKEN or REDIS_KV_REST_API_URL/TOKEN)"
       );
     }
-    const client = new UpstashRedis({
-      url: env.UPSTASH_REDIS_REST_URL,
-      token: env.UPSTASH_REDIS_REST_TOKEN
-    });
+    const client = new UpstashRedis({ url, token });
     return {
       get: key => client.get<string>(key),
       set: (key, value, options) =>
