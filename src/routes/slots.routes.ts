@@ -1,9 +1,8 @@
 import { Router } from "express";
-import { getSlots, replaceSlots } from "../controllers/slots.controller";
+import { getSlots } from "../controllers/slots.controller";
 
 const router = Router();
 
-router.get("/slots", getSlots);
-router.post("/reset", replaceSlots);
+router.get("/", getSlots);
 
 export default router;

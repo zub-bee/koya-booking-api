@@ -10,6 +10,7 @@ import { setupSwagger } from "./configs/swagger";
 import healthRoutes from "./routes/health.routes";
 import bookingRoutes from "./routes/booking.routes";
 import slotRoutes from "./routes/slots.routes";
+import resetRoutes from "./routes/reset.routes";
 import env from "./configs/env";
 import sourceMapSupport from "source-map-support";
 sourceMapSupport.install();
@@ -18,20 +19,20 @@ const app: Express = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(
-  cors({
-    origin: env.CORS_ORIGIN ?? "*",
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "X-Requested-With",
-      "X-API-Key",
-      "Idempotency-Key"
-    ],
-    credentials: true
-  })
-);
+// app.use(
+//   cors({
+//     origin: env.CORS_ORIGIN ?? "*",
+//     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+//     allowedHeaders: [
+//       "Content-Type",
+//       "Authorization",
+//       "X-Requested-With",
+//       "X-API-Key",
+//       "Idempotency-Key"
+//     ],
+//     credentials: true
+//   })
+// );
 app.use(helmet());
 app.use(cookieParser());
 app.use(morgan(env.NODE_ENV === "development" ? "dev" : "combined"));
@@ -46,7 +47,8 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use("/api/health", healthRoutes);
 
-app.use("/api/", apiKeyMiddleware, slotRoutes);
+app.use("/api/slots", apiKeyMiddleware, slotRoutes);
+app.use("/api/reset", apiKeyMiddleware, resetRoutes);
 app.use("/api/bookings", apiKeyMiddleware, bookingRoutes);
 
 // Not found handler (should be after routes)
