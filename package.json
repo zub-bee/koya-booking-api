@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "cross-env NODE_ENV=development npx tsx watch src/server.ts",
-    "build": "rm -rf dist && tsc && tsc-alias",
+    "build": "rm -rf dist && npx tsc && npx tsc-alias",
     "start": "cross-env NODE_ENV=production node dist/server.js",
     "typecheck": "tsc --noEmit",
     "lint:check": "eslint .",
@@ -41,6 +41,8 @@
     "source-map-support": "^0.5.21",
     "swagger-autogen": "^2.23.7",
     "swagger-ui-express": "^5.0.1",
+    "tsc-alias": "^1.9.9",
+    "typescript": "^7.0.2",
     "zod": "^4.6.7"
   },
   "devDependencies": {
