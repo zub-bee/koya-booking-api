@@ -1,19 +1,21 @@
 import { db } from "../configs/database";
 import { redis } from "../configs/redis";
 import { slots } from "../db/schema/slots";
+import { bookings } from "../db/schema/booking";
 import { eq } from "drizzle-orm";
 
 type ReplaceSlots = {
   id: string;
   provider: string;
-  start: string;
-  end: string;
+  available: boolean;
+  start: Date;
+  end: Date;
 };
 
-const CACHE_KEY = "bookings:all";
+const CACHE_KEY = "slots:all";
 const CACHE_TTL = 60;
 
-export const BookingService = {
+export const SlotService = {
   async getAll() {
     const cached = await redis.get(CACHE_KEY);
     if (cached) return JSON.parse(cached);
@@ -24,13 +26,30 @@ export const BookingService = {
   },
 
   async getById(id: string) {
-    const [booking] = await db.select().from(slots).orderBy(slots.start); //TODO: check if it is desc/asc
-    return booking ?? null;
-  }
+    const [slot] = await db.select().from(slots).where(eq(slots.id, id));
+    return slot ?? null;
+  },
 
-  //   async update(data: ReplaceSlots) {
-  //     const [booking] = await db.insert(slots).values(data).returning();
-  //     await redis.del(CACHE_KEY);
-  //     return booking;
-  //   }
+  async update(id: string, data: Omit<ReplaceSlots, "id">) {
+    const [updated] = await db
+      .update(slots)
+      .set(data)
+      .where(eq(slots.id, id))
+      .returning();
+    await redis.del(CACHE_KEY);
+    return updated ?? null;
+  },
+
+  async replaceAll(newSlots: ReplaceSlots[]) {
+    const parsed = newSlots.map(s => ({
+      ...s,
+      start: new Date(s.start),
+      end: new Date(s.end)
+    }));
+    await db.delete(bookings);
+    await db.delete(slots);
+    const inserted = await db.insert(slots).values(parsed).returning();
+    await redis.del(CACHE_KEY);
+    return inserted;
+  }
 };
