@@ -19,20 +19,20 @@ const app: Express = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// app.use(
-//   cors({
-//     origin: env.CORS_ORIGIN ?? "*",
-//     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-//     allowedHeaders: [
-//       "Content-Type",
-//       "Authorization",
-//       "X-Requested-With",
-//       "X-API-Key",
-//       "Idempotency-Key"
-//     ],
-//     credentials: true
-//   })
-// );
+app.use(
+  cors({
+    origin: env.CORS_ORIGIN ?? "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Requested-With",
+      "X-API-Key",
+      "Idempotency-Key"
+    ],
+    credentials: true
+  })
+);
 app.use(helmet());
 app.use(cookieParser());
 app.use(morgan(env.NODE_ENV === "development" ? "dev" : "combined"));
