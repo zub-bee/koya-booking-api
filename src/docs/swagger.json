@@ -7,7 +7,9 @@
   },
   "host": "localhost:3000",
   "basePath": "/api",
-  "schemes": ["http"],
+  "schemes": [
+    "http"
+  ],
   "paths": {
     "/health/": {
       "get": {
@@ -22,6 +24,158 @@
     "/health/detailed": {
       "get": {
         "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/booking/": {
+      "get": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      },
+      "post": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/booking/{id}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      },
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/slots": {
+      "get": {
+        "description": "Get all slots",
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "Filter by provider name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of slots",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "example": "slot-1"
+                  },
+                  "provider": {
+                    "type": "string",
+                    "example": "Dr. Smith"
+                  },
+                  "available": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "start": {
+                    "type": "string",
+                    "example": "2026-10-25T09:00:00Z"
+                  },
+                  "end": {
+                    "type": "string",
+                    "example": "2026-10-25T09:30:00Z"
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reset": {
+      "post": {
+        "description": "Replace all slots",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "slots": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "slot-1"
+                      },
+                      "provider": {
+                        "type": "string",
+                        "example": "Dr. Smith"
+                      },
+                      "available": {
+                        "type": "boolean",
+                        "example": true
+                      },
+                      "start": {
+                        "type": "string",
+                        "example": "2026-10-25T09:00:00Z"
+                      },
+                      "end": {
+                        "type": "string",
+                        "example": "2026-10-25T09:30:00Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
         "responses": {
           "default": {
             "description": ""
