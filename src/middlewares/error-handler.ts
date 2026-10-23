@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import env from "../configs/env";
-
 import { ApiError } from "../utils/api-error";
 import { logger } from "../utils/logger";
 
@@ -18,6 +17,9 @@ export const errorHandler = (
   if (err instanceof ApiError) {
     statusCode = err.statusCode;
     message = err.error;
+    if (err.retryAfter !== undefined) {
+      res.set("Retry-After", String(err.retryAfter));
+    }
   }
 
   logger.error(
@@ -25,10 +27,8 @@ export const errorHandler = (
     `Error: ${message} | Status: ${statusCode} | Path: ${req.method} ${req.originalUrl}`
   );
 
-  const response = {
-    error: message,
-    ...(env.NODE_ENV === "development" && { stack: err.stack })
-  };
+  const response: Record<string, unknown> = { error: message };
+  if (env.NODE_ENV === "development") response.stack = err.stack;
 
   res.status(statusCode).json(response);
 };
