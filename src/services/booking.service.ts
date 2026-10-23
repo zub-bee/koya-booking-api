@@ -1,7 +1,7 @@
 import { db } from "../configs/database";
 import { redis } from "../configs/redis";
 import { bookings } from "../db/schema/booking";
-import { eq } from "drizzle-orm";
+import { and, desc, eq, lt, or } from "drizzle-orm";
 
 type CreateBookingInput = {
   id: string;
@@ -12,16 +12,47 @@ type CreateBookingInput = {
 };
 
 const CACHE_KEY = "bookings:all";
-const CACHE_TTL = 60;
 
 export const BookingService = {
-  async getAll() {
-    const cached = await redis.get(CACHE_KEY);
-    if (cached) return JSON.parse(cached);
+  async getAll(email: string, limit = 10, cursor?: string) {
+    const pageSize = Math.min(limit, 50);
 
-    const result = await db.select().from(bookings);
-    await redis.set(CACHE_KEY, JSON.stringify(result), "EX", CACHE_TTL);
-    return result;
+    let decoded: { createdAt: string; id: string } | null = null;
+    if (cursor) {
+      decoded = JSON.parse(Buffer.from(cursor, "base64").toString("utf8"));
+    }
+
+    const conditions = [eq(bookings.email, email)];
+    if (decoded) {
+      conditions.push(
+        or(
+          lt(bookings.createdAt, new Date(decoded.createdAt)),
+          and(
+            eq(bookings.createdAt, new Date(decoded.createdAt)),
+            lt(bookings.id, decoded.id)
+          )
+        )!
+      );
+    }
+
+    const rows = await db
+      .select()
+      .from(bookings)
+      .where(and(...conditions))
+      .orderBy(desc(bookings.createdAt), desc(bookings.id))
+      .limit(pageSize + 1);
+
+    const hasMore = rows.length > pageSize;
+    const result = hasMore ? rows.slice(0, pageSize) : rows;
+    const last = result[result.length - 1];
+    const next_cursor =
+      hasMore && last
+        ? Buffer.from(
+            JSON.stringify({ createdAt: last.createdAt, id: last.id })
+          ).toString("base64")
+        : null;
+
+    return { bookings: result, next_cursor };
   },
 
   async getById(id: string) {
@@ -38,12 +69,13 @@ export const BookingService = {
     return booking;
   },
 
-  async deleteById(id: string) {
-    const [deleted] = await db
-      .delete(bookings)
+  async cancelById(id: string) {
+    const [cancelled] = await db
+      .update(bookings)
+      .set({ status: "cancelled" })
       .where(eq(bookings.id, id))
       .returning();
     await redis.del(CACHE_KEY);
-    return deleted ?? null;
+    return cancelled ?? null;
   }
 };

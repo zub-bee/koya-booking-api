@@ -15,11 +15,9 @@ export const errorHandler = (
   }
   let statusCode = 500;
   let message = "Internal server error";
-  let errors: unknown;
   if (err instanceof ApiError) {
     statusCode = err.statusCode;
-    message = err.message;
-    errors = err.errors;
+    message = err.error;
   }
 
   logger.error(
@@ -28,10 +26,7 @@ export const errorHandler = (
   );
 
   const response = {
-    success: false,
-    message,
-    statusCode,
-    ...(errors !== undefined && { errors }),
+    error: message,
     ...(env.NODE_ENV === "development" && { stack: err.stack })
   };
 

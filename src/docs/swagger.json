@@ -33,10 +33,63 @@
     },
     "/booking/": {
       "get": {
-        "description": "",
+        "description": "Get bookings",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "description": "Filter by email"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "1-50 only"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "List of slots",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "example": "slot-1"
+                  },
+                  "provider": {
+                    "type": "string",
+                    "example": "Dr. Smith"
+                  },
+                  "available": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "start": {
+                    "type": "string",
+                    "example": "2026-10-25T09:00:00Z"
+                  },
+                  "end": {
+                    "type": "string",
+                    "example": "2026-10-25T09:30:00Z"
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       },

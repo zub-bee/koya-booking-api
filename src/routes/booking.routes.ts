@@ -3,7 +3,7 @@ import {
   getBookings,
   getBookingById,
   createBooking,
-  deleteBooking
+  cancelBooking
 } from "../controllers/booking.controller";
 
 const router = Router();
@@ -11,6 +11,6 @@ const router = Router();
 router.get("/", getBookings);
 router.get("/:id", getBookingById);
 router.post("/", createBooking);
-router.delete("/:id", deleteBooking);
+router.delete("/:id", cancelBooking);
 
 export default router;

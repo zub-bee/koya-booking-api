@@ -10,8 +10,6 @@ export class ApiError extends Error {
     this.statusCode = statusCode;
     this.error = error;
     this.isOperational = isOperational;
-
-    Error.captureStackTrace(this, this.constructor);
   }
 
   static badRequest(error = "Bad Request") {
