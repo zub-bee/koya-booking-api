@@ -20,7 +20,7 @@ export const SlotService = {
   async getAll(provider?: string) {
     const cacheKey = provider ? `${CACHE_KEY}:${provider}` : CACHE_KEY;
     const cached = await redis.get(cacheKey);
-    if (cached) return JSON.parse(cached);
+    if (cached) return typeof cached === 'string' ? JSON.parse(cached) : cached;
 
     const query = db.select().from(slots).orderBy(asc(slots.start));
     const result = provider
