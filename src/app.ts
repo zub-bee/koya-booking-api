@@ -29,8 +29,7 @@ app.use(
       "X-Requested-With",
       "X-API-Key",
       "Idempotency-Key"
-    ],
-    credentials: true
+    ]
   })
 );
 app.use(
