@@ -1,8 +1,8 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "Express Starter",
-    "description": "Express Starter",
+    "title": "Clinic Booking API",
+    "description": "Koya Cohort 4 Assessment API",
     "version": "1.0.0"
   },
   "host": "localhost:3000",
@@ -10,6 +10,13 @@
   "schemes": [
     "http"
   ],
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "X-API-Key"
+    }
+  },
   "paths": {
     "/health/": {
       "get": {
@@ -31,78 +38,102 @@
         }
       }
     },
-    "/booking/": {
+    "/slots": {
       "get": {
-        "description": "Get bookings",
+        "description": "",
         "parameters": [
           {
-            "name": "email",
+            "name": "provider",
             "in": "query",
-            "required": true,
-            "type": "string",
-            "description": "Filter by email"
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "description": "1-50 only"
-          },
-          {
-            "name": "cursor",
-            "in": "query",
-            "required": false,
             "type": "string"
           }
         ],
         "responses": {
           "200": {
-            "description": "List of slots",
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/reset": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
             "schema": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "string",
-                    "example": "slot-1"
-                  },
-                  "provider": {
-                    "type": "string",
-                    "example": "Dr. Smith"
-                  },
-                  "available": {
-                    "type": "boolean",
-                    "example": true
-                  },
-                  "start": {
-                    "type": "string",
-                    "example": "2026-10-25T09:00:00Z"
-                  },
-                  "end": {
-                    "type": "string",
-                    "example": "2026-10-25T09:30:00Z"
-                  }
+              "type": "object",
+              "properties": {
+                "slots": {
+                  "example": "any"
                 }
-              },
-              "xml": {
-                "name": "main"
               }
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/bookings/": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
       "post": {
         "description": "",
+        "parameters": [
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "type": "string"
+          }
+        ],
         "responses": {
-          "default": {
-            "description": ""
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
     },
-    "/booking/{id}": {
+    "/bookings/{id}": {
       "get": {
         "description": "",
         "parameters": [
@@ -114,8 +145,11 @@
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
@@ -130,111 +164,19 @@
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/slots": {
-      "get": {
-        "description": "Get all slots",
-        "parameters": [
-          {
-            "name": "provider",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "description": "Filter by provider name"
-          }
-        ],
-        "responses": {
           "200": {
-            "description": "List of slots",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "string",
-                    "example": "slot-1"
-                  },
-                  "provider": {
-                    "type": "string",
-                    "example": "Dr. Smith"
-                  },
-                  "available": {
-                    "type": "boolean",
-                    "example": true
-                  },
-                  "start": {
-                    "type": "string",
-                    "example": "2026-10-25T09:00:00Z"
-                  },
-                  "end": {
-                    "type": "string",
-                    "example": "2026-10-25T09:30:00Z"
-                  }
-                }
-              },
-              "xml": {
-                "name": "main"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/reset": {
-      "post": {
-        "description": "Replace all slots",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "slots": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "example": "slot-1"
-                      },
-                      "provider": {
-                        "type": "string",
-                        "example": "Dr. Smith"
-                      },
-                      "available": {
-                        "type": "boolean",
-                        "example": true
-                      },
-                      "start": {
-                        "type": "string",
-                        "example": "2026-10-25T09:00:00Z"
-                      },
-                      "end": {
-                        "type": "string",
-                        "example": "2026-10-25T09:30:00Z"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": ""
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
     }
-  }
+  },
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ]
 }

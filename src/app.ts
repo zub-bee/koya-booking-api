@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import { notFoundHandler } from "./middlewares/not-found-handler";
 import { errorHandler } from "./middlewares/error-handler";
+import { apiKeyMiddleware } from "./middlewares/api-key";
 import { setupSwagger } from "./configs/swagger";
 import healthRoutes from "./routes/health.routes";
 import bookingRoutes from "./routes/booking.routes";
@@ -21,7 +22,7 @@ app.use(
   cors({
     origin: env.CORS_ORIGIN,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "X-API-Key", "Idempotency-Key"],
     credentials: true
   })
 );
@@ -39,9 +40,8 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use("/api/health", healthRoutes);
 
-app.use("/api/booking", bookingRoutes);
-
-app.use("/api/", slotRoutes);
+app.use("/api/", apiKeyMiddleware, slotRoutes);
+app.use("/api/bookings", apiKeyMiddleware, bookingRoutes);
 
 // Not found handler (should be after routes)
 app.use(notFoundHandler);

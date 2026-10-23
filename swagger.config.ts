@@ -3,13 +3,21 @@ import swaggerAutoGen from "swagger-autogen";
 
 const doc = {
   info: {
-    title: "Express Starter",
-    description: "Express Starter",
+    title: "Clinic Booking API",
+    description: "Koya Cohort 4 Assessment API",
     version: "1.0.0"
   },
   host: `localhost:3000`,
   basePath: "/api",
-  schemes: ["http"]
+  schemes: ["http"],
+  securityDefinitions: {
+    ApiKeyAuth: {
+      type: "apiKey",
+      in: "header",
+      name: "X-API-Key"
+    }
+  },
+  security: [{ ApiKeyAuth: [] }]
 };
 
 const outputFile = "./src/docs/swagger.json";
