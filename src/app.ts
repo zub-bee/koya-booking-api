@@ -8,6 +8,7 @@ import { errorHandler } from "./middlewares/error-handler";
 import { setupSwagger } from "./configs/swagger";
 import healthRoutes from "./routes/health.routes";
 import bookingRoutes from "./routes/booking.routes";
+import slotRoutes from "./routes/slots.routes";
 import env from "./configs/env";
 import sourceMapSupport from "source-map-support";
 sourceMapSupport.install();
@@ -40,7 +41,7 @@ app.use("/api/health", healthRoutes);
 
 app.use("/api/booking", bookingRoutes);
 
-// app.use("/api/slots", slotsRoutes);
+app.use("/api/slots", slotRoutes);
 
 // app.use("/api/reset", resetRoutes);
 

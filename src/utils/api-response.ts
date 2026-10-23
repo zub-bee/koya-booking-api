@@ -2,64 +2,45 @@ import { STATUS_CODES, StatusCode } from "../constants/status-codes";
 import type { Response } from "express";
 
 type ApiResponseParams<T> = {
-  success: boolean;
-  message: string;
-  statusCode: StatusCode;
+  error?: string;
   data?: T | null;
-  errors?: unknown;
 };
 
 export class ApiResponse<T = unknown> {
-  public readonly success: boolean;
-  public readonly message: string;
-  public readonly statusCode: StatusCode;
+  public readonly error: string | undefined;
   public readonly data?: T | null;
-  public readonly errors?: unknown;
+  public readonly statusCode!: number;
 
-  constructor({
-    success,
-    message,
-    statusCode,
-    data,
-    errors
-  }: ApiResponseParams<T>) {
-    this.success = success;
-    this.message = message;
-    this.statusCode = statusCode;
+  constructor({ error, data }: ApiResponseParams<T>) {
+    this.error = error;
     this.data = data;
-    this.errors = errors;
   }
 
   send(res: Response): Response {
     return res.status(this.statusCode).json({
-      success: this.success,
-      message: this.message,
-      statusCode: this.statusCode,
-      ...(this.data !== undefined && { data: this.data }),
-      ...(this.errors !== undefined && { errors: this.errors })
+      error: this.error,
+      ...(this.data !== undefined && { data: this.data })
     });
   }
 
-  static Success<T>(
-    res: Response,
-    message: string,
-    data?: T,
-    statusCode: StatusCode = STATUS_CODES.OK
-  ): Response {
+  static Success<T>(res: Response, data?: T): Response {
     return new ApiResponse<T>({
-      success: true,
-      message,
-      data,
-      statusCode
+      data
     }).send(res);
   }
 
-  static ok<T>(res: Response, message = "OK", data?: T) {
-    return ApiResponse.Success(res, message, data, STATUS_CODES.OK);
+  static NotFound<T>(res: Response, error: string): Response {
+    return new ApiResponse<T>({
+      error
+    }).send(res);
   }
 
-  static created<T>(res: Response, message = "Created", data?: T) {
-    return ApiResponse.Success(res, message, data, STATUS_CODES.CREATED);
+  static ok<T>(res: Response, data?: T) {
+    return ApiResponse.Success(res, data);
+  }
+
+  static created<T>(res: Response, data?: T) {
+    return ApiResponse.Success(res, data);
   }
 }
 
